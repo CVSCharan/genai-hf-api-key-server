@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const localAuthRoutes = require("./routes/localAuthRoutes");
+const testimonialRoutes = require("./routes/testimonialRoutes");
 const { configureSession } = require("./controllers/sessionController");
 
 // Passport config
@@ -43,6 +44,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/sessions", sessionRoutes);
 app.use("/api/v1/local-auth", localAuthRoutes);
+app.use("/api/v1/testimonials", testimonialRoutes);
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
