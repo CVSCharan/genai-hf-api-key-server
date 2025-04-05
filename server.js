@@ -13,7 +13,7 @@ const { configureSession } = require("./controllers/sessionController");
 require("./config/passport")(passport);
 
 const app = express();
-const port = process.env.PORT || 4040; //use environment port or 5000 as a default
+const port = process.env.PORT || 4040;
 
 app.use(express.json());
 app.use(

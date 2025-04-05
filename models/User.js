@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -27,7 +26,7 @@ const UserSchema = new mongoose.Schema(
     password: {
       type: String,
       // Required only for local authentication
-      required: function() {
+      required: function () {
         return this.provider === "local";
       },
     },
@@ -37,7 +36,7 @@ const UserSchema = new mongoose.Schema(
     },
     isVerified: {
       type: Boolean,
-      default: function() {
+      default: function () {
         // OAuth users are considered verified
         return this.provider !== "local";
       },
@@ -45,21 +44,18 @@ const UserSchema = new mongoose.Schema(
     verificationToken: String,
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    // Add array field for HF API keys
+    hfApiKeys: [
+      {
+        name: String,
+        key: String,
+        isActive: { type: Boolean, default: true },
+        createdAt: { type: Date, default: Date.now },
+        lastUsed: Date,
+      },
+    ],
   },
   { timestamps: true }
 );
-
-// Hash password before saving
-UserSchema.pre("save", async function(next) {
-  if (this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
-});
-
-// Method to compare password
-UserSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
 
 module.exports = mongoose.model("User", UserSchema);
