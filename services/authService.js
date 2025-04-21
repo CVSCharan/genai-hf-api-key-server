@@ -33,104 +33,123 @@ exports.getGoogleAuthUrl = () => {
 
 exports.handleGoogleCallback = async (code, isRegistration = false) => {
   logger.info("Handling Google OAuth callback", { isRegistration });
-  
+
   // Get tokens
   logger.debug("Requesting Google tokens with auth code");
   const { id_token, access_token } = await getGoogleTokens(code);
-  
+
   // Get user with tokens
   logger.debug("Fetching Google user profile");
   const googleUser = await getGoogleUser(id_token, access_token);
-  
+
   if (!googleUser.verified_email) {
-    logger.warn("Unverified Google account attempted login", { email: googleUser.email });
+    logger.warn("Unverified Google account attempted login", {
+      email: googleUser.email,
+    });
     throw new Error("Google account not verified");
   }
-  
+
   // Check if user exists
-  const existingUser = await User.findOne({ 
+  const existingUser = await User.findOne({
     $or: [
       { email: googleUser.email },
-      { providerId: googleUser.sub, provider: "google" }
-    ]
+      { providerId: googleUser.sub, provider: "google" },
+    ],
   });
-  
+
   // If this is a registration attempt and user exists, throw error
   if (isRegistration && existingUser) {
-    logger.warn("Registration failed: User already exists", { email: googleUser.email });
+    logger.warn("Registration failed: User already exists", {
+      email: googleUser.email,
+    });
     throw new Error("User with this email already exists");
   }
-  
+
   // If this is a login attempt and user doesn't exist, throw error
   if (!isRegistration && !existingUser) {
-    logger.warn("Login failed: User doesn't exist", { email: googleUser.email });
-    throw new Error("No account found with this Google account. Please register first.");
+    logger.warn("Login failed: User doesn't exist", {
+      email: googleUser.email,
+    });
+    throw new Error(
+      "No account found with this Google account. Please register first."
+    );
   }
-  
+
   // Upsert user
-  logger.info("Upserting user from Google profile", { email: googleUser.email });
+  logger.info("Upserting user from Google profile", {
+    email: googleUser.email,
+  });
   const user = await upsertUser({
     email: googleUser.email,
     name: googleUser.name,
     picture: googleUser.picture,
     provider: "google",
     providerId: googleUser.sub,
-    isVerified: true
+    role: "user",
+    isVerified: true,
   });
-  
+
   // Create JWT token
-  logger.debug("Creating JWT token for authenticated user", { userId: user._id });
+  logger.debug("Creating JWT token for authenticated user", {
+    userId: user._id,
+  });
   const token = jwt.sign(
     { id: user._id, email: user.email },
     process.env.JWT_SECRET,
     { expiresIn: "1d" }
   );
-  
+
   logger.info("Google authentication successful", { userId: user._id });
   return { user, token };
 };
 
 exports.handleGithubCallback = async (code, isRegistration = false) => {
   logger.info("Handling GitHub OAuth callback", { isRegistration });
-  
+
   // Get token
   logger.debug("Requesting GitHub access token with auth code");
   const token = await getGithubToken(code);
-  
+
   // Get user with token
   logger.debug("Fetching GitHub user profile");
   const githubUser = await getGithubUser(token);
-  
+
   // Get user email
   logger.debug("Fetching GitHub user emails");
   const emails = await getGithubUserEmails(token);
-  const primaryEmail = emails.find(email => email.primary)?.email;
-  
+  const primaryEmail = emails.find((email) => email.primary)?.email;
+
   if (!primaryEmail) {
-    logger.warn("No primary email found for GitHub user", { userId: githubUser.id });
+    logger.warn("No primary email found for GitHub user", {
+      userId: githubUser.id,
+    });
     throw new Error("No primary email found");
   }
-  
+
   // Check if user exists
-  const existingUser = await User.findOne({ 
+  const existingUser = await User.findOne({
     $or: [
       { email: primaryEmail },
-      { providerId: githubUser.id.toString(), provider: "github" }
-    ]
+      { providerId: githubUser.id.toString(), provider: "github" },
+    ],
   });
-  
+
   // If this is a registration attempt and user exists, throw error
   if (isRegistration && existingUser) {
-    logger.warn("Registration failed: User already exists", { email: primaryEmail });
+    logger.warn("Registration failed: User already exists", {
+      email: primaryEmail,
+    });
     throw new Error("User with this email already exists");
   }
-  
+
   // If this is a login attempt and user doesn't exist, throw error
   if (!isRegistration && !existingUser) {
     logger.warn("Login failed: User doesn't exist", { email: primaryEmail });
-    throw new Error("No account found with this GitHub account. Please register first.");
+    throw new Error(
+      "No account found with this GitHub account. Please register first."
+    );
   }
-  
+
   // Upsert user
   logger.info("Upserting user from GitHub profile", { email: primaryEmail });
   const user = await upsertUser({
@@ -139,17 +158,20 @@ exports.handleGithubCallback = async (code, isRegistration = false) => {
     picture: githubUser.avatar_url,
     provider: "github",
     providerId: githubUser.id.toString(),
-    isVerified: true
+    role: "user",
+    isVerified: true,
   });
-  
+
   // Create JWT token
-  logger.debug("Creating JWT token for authenticated user", { userId: user._id });
+  logger.debug("Creating JWT token for authenticated user", {
+    userId: user._id,
+  });
   const jwtToken = jwt.sign(
     { id: user._id, email: user.email },
     process.env.JWT_SECRET,
     { expiresIn: "1d" }
   );
-  
+
   logger.info("GitHub authentication successful", { userId: user._id });
   return { user, token: jwtToken };
 };

@@ -3,12 +3,15 @@ const router = express.Router();
 const authController = require("../controllers/authController");
 const loginController = require("../controllers/loginController");
 const registerController = require("../controllers/registerController");
-const { isAuthenticated } = require("../middleware/authMiddleware");
+const statsController = require("../controllers/statsController");
+const { isAuthenticated, isAdmin } = require("../middleware/authMiddleware");
 const logger = require("../utils/logger");
 
 // Log route access
 const logRoute = (req, res, next) => {
-  logger.info(`Auth route accessed: ${req.method} ${req.originalUrl}`, { ip: req.ip });
+  logger.info(`Auth route accessed: ${req.method} ${req.originalUrl}`, {
+    ip: req.ip,
+  });
   next();
 };
 
@@ -16,13 +19,21 @@ const logRoute = (req, res, next) => {
 router.use(logRoute);
 
 // Registration routes
-router.post("/register", registerController.checkEmailNotOAuth, registerController.registerLocal);
+router.post(
+  "/register",
+  registerController.checkEmailNotOAuth,
+  registerController.registerLocal
+);
 router.get("/register/google", registerController.googleRegister);
 router.get("/register/github", registerController.githubRegister);
 router.get("/verify/:token", registerController.verifyEmail);
 
 // Login routes
-router.post("/login", loginController.checkLocalUser, loginController.loginLocal);
+router.post(
+  "/login",
+  loginController.checkLocalUser,
+  loginController.loginLocal
+);
 router.get("/login/google", loginController.googleLogin);
 router.get("/login/github", loginController.githubLogin);
 
@@ -33,10 +44,40 @@ router.get("/github/callback", authController.githubCallback);
 // Password management
 router.post("/forgot-password", loginController.forgotPassword);
 router.post("/reset-password/:token", loginController.resetPassword);
-router.post("/set-password", isAuthenticated, loginController.setPasswordForOAuthUser);
+router.post(
+  "/set-password",
+  isAuthenticated,
+  loginController.setPasswordForOAuthUser
+);
 
 // User info and logout
 router.get("/me", authController.getCurrentUser);
 router.get("/logout", authController.logout);
+
+// User statistics routes (admin only)
+router.get(
+  "/stats/users",
+  isAuthenticated,
+  isAdmin,
+  statsController.getUserStats
+);
+router.get(
+  "/stats/auth-methods",
+  isAuthenticated,
+  isAdmin,
+  statsController.getAuthMethodStats
+);
+router.get(
+  "/stats/registrations",
+  isAuthenticated,
+  isAdmin,
+  statsController.getRegistrationStats
+);
+router.get(
+  "/stats/logins",
+  isAuthenticated,
+  isAdmin,
+  statsController.getLoginStats
+);
 
 module.exports = router;

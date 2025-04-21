@@ -3,12 +3,11 @@ const router = express.Router();
 const { isAuthenticated } = require("../middleware/authMiddleware");
 const logger = require("../utils/logger");
 
-// Create a controller for session routes if it doesn't exist
-const sessionController = require("../controllers/sessionController");
-
 // Log route access
 const logRoute = (req, res, next) => {
-  logger.info(`Session route accessed: ${req.method} ${req.originalUrl}`, { ip: req.ip });
+  logger.info(`Session route accessed: ${req.method} ${req.originalUrl}`, {
+    ip: req.ip,
+  });
   next();
 };
 
@@ -22,13 +21,15 @@ router.get("/current", isAuthenticated, (req, res) => {
     success: true,
     session: {
       id: req.sessionID,
-      user: req.user ? {
-        id: req.user._id,
-        name: req.user.name,
-        email: req.user.email
-      } : null,
-      isAuthenticated: req.isAuthenticated()
-    }
+      user: req.user
+        ? {
+            id: req.user._id,
+            name: req.user.name,
+            email: req.user.email,
+          }
+        : null,
+      isAuthenticated: req.isAuthenticated(),
+    },
   });
 });
 
@@ -40,23 +41,23 @@ router.delete("/current", isAuthenticated, (req, res) => {
       logger.error("Error during logout:", err);
       return res.status(500).json({
         success: false,
-        message: "Error during logout"
+        message: "Error during logout",
       });
     }
-    
+
     req.session.destroy((err) => {
       if (err) {
         logger.error("Error destroying session:", err);
         return res.status(500).json({
           success: false,
-          message: "Error destroying session"
+          message: "Error destroying session",
         });
       }
-      
+
       res.clearCookie("connect.sid");
       res.json({
         success: true,
-        message: "Logged out successfully"
+        message: "Logged out successfully",
       });
     });
   });

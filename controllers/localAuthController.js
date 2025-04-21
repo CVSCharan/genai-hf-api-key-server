@@ -45,7 +45,7 @@ exports.register = async (req, res) => {
     });
 
     // Send verification email
-    // await localAuthService.sendVerificationEmail(user.email, verificationToken);
+    await localAuthService.sendVerificationEmail(user.email, verificationToken);
 
     logger.info("User registered successfully", { userId: user._id });
     res.status(201).json({

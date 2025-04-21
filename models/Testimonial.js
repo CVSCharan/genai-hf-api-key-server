@@ -7,6 +7,15 @@ const TestimonialSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    avatar: {
+      type: String,
+      trim: true,
+    },
     content: {
       type: String,
       required: true,

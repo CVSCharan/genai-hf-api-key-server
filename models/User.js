@@ -31,6 +31,11 @@ const UserSchema = new mongoose.Schema(
         return this.provider === "local";
       },
     },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
     isAdmin: {
       type: Boolean,
       default: false,
@@ -46,15 +51,15 @@ const UserSchema = new mongoose.Schema(
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     // Add array field for HF API keys
-    hfApiKeys: [
-      {
-        name: String,
-        key: String,
-        isActive: { type: Boolean, default: true },
-        createdAt: { type: Date, default: Date.now },
-        lastUsed: Date,
-      },
-    ],
+    // hfApiKeys: [
+    //   {
+    //     name: String,
+    //     key: String,
+    //     isActive: { type: Boolean, default: true },
+    //     createdAt: { type: Date, default: Date.now },
+    //     lastUsed: Date,
+    //   },
+    // ],
   },
   { timestamps: true }
 );

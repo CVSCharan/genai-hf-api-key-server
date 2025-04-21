@@ -10,8 +10,6 @@ exports.googleAuth = (req, res) => {
   res.redirect(authUrl);
 };
 
-// Update the OAuth callback methods in your existing authController.js
-
 // Google OAuth callback
 exports.googleCallback = async (req, res) => {
   try {
@@ -317,6 +315,7 @@ exports.getCurrentUser = async (req, res) => {
     logger.info(`Current user info retrieved for: ${user.email}`);
     res.json({
       success: true,
+      token: token,
       user: {
         id: user._id,
         name: user.name,
@@ -356,8 +355,6 @@ exports.logout = (req, res) => {
     message: "Logged out successfully",
   });
 };
-
-// Add these middleware functions to your existing authController.js
 
 // Check if email is not already used by an OAuth account
 exports.checkEmailNotOAuth = async (req, res, next) => {

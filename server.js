@@ -8,7 +8,10 @@ const authRoutes = require("./routes/authRoutes");
 const sessionRoutes = require("./routes/sessionRoutes");
 const localAuthRoutes = require("./routes/localAuthRoutes");
 const testimonialRoutes = require("./routes/testimonialRoutes");
+const huggingfaceRoutes = require("./routes/huggingfaceRoutes");
+const apiStatRoutes = require("./routes/apiStatRoutes");
 const { configureSession } = require("./controllers/sessionController");
+const { trackApiStat } = require("./middleware/apiStatMiddleware");
 
 // Passport config
 require("./config/passport")(passport);
@@ -19,7 +22,7 @@ const port = process.env.PORT || 4040;
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "http://localhost:3001"], // Fixed array syntax - separate with commas
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
@@ -35,6 +38,9 @@ app.use(configureSession());
 app.use(passport.initialize());
 app.use(passport.session());
 
+// API stats tracking middleware (apply to all routes)
+app.use(trackApiStat);
+
 // Root route
 app.get("/", (req, res) => {
   res.send("Welcome to GenAI API Key Project Server");
@@ -42,9 +48,11 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/sessions", sessionRoutes);
 app.use("/api/v1/local-auth", localAuthRoutes);
+app.use("/api/v1/sessions", sessionRoutes);
 app.use("/api/v1/testimonials", testimonialRoutes);
+app.use("/api/v1/huggingface", huggingfaceRoutes);
+app.use("/api/v1/stats", apiStatRoutes);
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
