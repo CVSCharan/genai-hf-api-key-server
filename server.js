@@ -47,7 +47,61 @@ app.use(trackApiStat);
 
 // Root route
 app.get("/", (req, res) => {
-  res.send("Welcome to GenAI API Key Project Server");
+  const htmlResponse = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>GenAI API Key Server</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 40px;
+                background-color: #f4f4f4;
+                color: #333;
+                line-height: 1.6;
+            }
+            .container {
+                max-width: 800px;
+                margin: auto;
+                background: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                color: #0056b3;
+                text-align: center;
+                border-bottom: 2px solid #eee;
+                padding-bottom: 10px;
+            }
+            p {
+                text-align: center;
+                font-size: 1.1em;
+            }
+            footer {
+                text-align: center;
+                margin-top: 30px;
+                font-size: 0.9em;
+                color: #777;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Welcome to the GenAI API Key Project Server</h1>
+            <p>This server manages API keys and provides access to various Generative AI models.</p>
+            <p>Explore the available API endpoints to integrate AI capabilities into your applications.</p>
+            <footer>
+                &copy; ${new Date().getFullYear()} GenAI Project
+            </footer>
+        </div>
+    </body>
+    </html>
+  `;
+  res.setHeader('Content-Type', 'text/html');
+  res.send(htmlResponse);
 });
 
 // Routes
