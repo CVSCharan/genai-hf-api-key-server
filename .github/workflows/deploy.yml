@@ -3,7 +3,7 @@ name: Deploy Express App to EC2
 on:
   push:
     branches:
-      - main # Change if you use a different branch
+      - main
 
 jobs:
   deploy:
@@ -18,13 +18,20 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.GENAI_EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H api-genai.charan-cvs.dev >> ~/.ssh/known_hosts
+          # Strict host key checking
+          echo -e "Host api-genai.charan-cvs.dev\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          # Alternative to ssh-keyscan:
+          ssh-keyscan api-genai.charan-cvs.dev >> ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        run: ssh -i ~/.ssh/id_rsa -v ubuntu@api-genai.charan-cvs.dev echo "SSH connection successful"
 
       - name: Deploy and Restart Express App
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@api-genai.charan-cvs.dev << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o ConnectTimeout=15 ubuntu@api-genai.charan-cvs.dev << 'EOF'
             cd /home/ubuntu/genai-hf-api-key-server
-            git pull origin main
-            npm install
+            git fetch
+            git reset --hard origin/main
+            npm install --production
             pm2 restart cvs-genai-server
           EOF

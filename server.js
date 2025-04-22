@@ -26,6 +26,7 @@ app.use(
       "http://localhost:3000",
       "http://localhost:3001",
       "https://genai.charan-cvs.dev",
+      "https://genai-analytics.charan-cvs.dev",
     ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
@@ -100,7 +101,7 @@ app.get("/", (req, res) => {
     </body>
     </html>
   `;
-  res.setHeader('Content-Type', 'text/html');
+  res.setHeader("Content-Type", "text/html");
   res.send(htmlResponse);
 });
 
