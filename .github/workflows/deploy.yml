@@ -1,0 +1,30 @@
+name: Deploy Express App to EC2
+
+on:
+  push:
+    branches:
+      - main # Change if you use a different branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GENAI_EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 15.207.11.209 >> ~/.ssh/known_hosts
+
+      - name: Deploy and Restart Express App
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@15.207.11.209 << 'EOF'
+            cd /home/ubuntu/genai-hf-api-key-server
+            git pull origin main
+            npm install
+            pm2 restart cvs-genai-server
+          EOF

@@ -22,7 +22,11 @@ const port = process.env.PORT || 4040;
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"], // Fixed array syntax - separate with commas
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://genai.charan-cvs.dev",
+    ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
