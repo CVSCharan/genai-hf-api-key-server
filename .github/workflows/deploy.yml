@@ -22,7 +22,7 @@ jobs:
 
       - name: Deploy and Restart Express App
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@15.207.11.209 << 'EOF'
+          ssh -i ~/.ssh/id_rsa ubuntu@api-genai.charan-cvs.dev << 'EOF'
             cd /home/ubuntu/genai-hf-api-key-server
             git pull origin main
             npm install
