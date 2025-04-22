@@ -18,11 +18,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.GENAI_EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 15.207.11.209 >> ~/.ssh/known_hosts
+          ssh-keyscan -H api-genai.charan-cvs.dev >> ~/.ssh/known_hosts
 
       - name: Deploy and Restart Express App
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@15.207.11.209 << 'EOF'
+          ssh -i ~/.ssh/id_rsa ubuntu@api-genai.charan-cvs.dev << 'EOF'
             cd /home/ubuntu/genai-hf-api-key-server
             git pull origin main
             npm install

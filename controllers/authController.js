@@ -33,7 +33,7 @@ exports.googleCallback = async (req, res) => {
     const token = encodeURIComponent(userData.token);
     // Redirect with token as query parameter
     const redirectUrl = `${
-      process.env.CLIENT_URL || "http://localhost:3000/auth"
+      process.env.GENAI_PLATFORM_CLIENT_URL || "http://localhost:3000/auth"
     }/success?token=${token}`;
     logger.debug(`Redirecting to: ${redirectUrl}`);
 
@@ -48,7 +48,7 @@ exports.googleCallback = async (req, res) => {
     // Redirect with error message as query parameter
     res.redirect(
       `${
-        process.env.CLIENT_URL || "http://localhost:3000/auth"
+        process.env.GENAI_PLATFORM_CLIENT_URL || "http://localhost:3000/auth"
       }/error?message=${errorMessage}`
     );
   }
@@ -77,7 +77,7 @@ exports.githubCallback = async (req, res) => {
     const token = encodeURIComponent(userData.token);
     // Redirect with token as query parameter
     const redirectUrl = `${
-      process.env.CLIENT_URL || "http://localhost:3000/auth"
+      process.env.GENAI_PLATFORM_CLIENT_URL || "http://localhost:3000/auth"
     }/success?token=${token}`;
     logger.debug(`Redirecting to: ${redirectUrl}`);
 
@@ -92,7 +92,7 @@ exports.githubCallback = async (req, res) => {
     // Redirect with error message as query parameter
     res.redirect(
       `${
-        process.env.CLIENT_URL || "http://localhost:3000/auth"
+        process.env.GENAI_PLATFORM_CLIENT_URL || "http://localhost:3000/auth"
       }/error?message=${errorMessage}`
     );
   }
@@ -201,7 +201,7 @@ exports.verifyEmail = async (req, res) => {
 
     logger.info("Email verified successfully");
     res.redirect(
-      `${process.env.CLIENT_URL || "http://localhost:3000/auth"}/verified`
+      `${process.env.GENAI_PLATFORM_CLIENT_URL || "http://localhost:3000/auth"}/verified`
     );
   } catch (error) {
     logger.error("Email verification error:", {
@@ -210,7 +210,7 @@ exports.verifyEmail = async (req, res) => {
     });
     res.redirect(
       `${
-        process.env.CLIENT_URL || "http://localhost:3000/auth"
+        process.env.GENAI_PLATFORM_CLIENT_URL || "http://localhost:3000/auth"
       }/error?message=Invalid or expired verification token`
     );
   }
