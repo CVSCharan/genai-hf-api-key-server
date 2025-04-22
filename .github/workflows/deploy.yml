@@ -16,19 +16,24 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.GENAI_EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          # Use proper newline handling for the private key
+          echo "${{ secrets.GENAI_EC2_SSH_KEY }}" | sed 's/\\n/\n/g' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          # Strict host key checking
-          echo -e "Host api-genai.charan-cvs.dev\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-          # Alternative to ssh-keyscan:
+          # Add strict host checking config
+          echo -e "Host api-genai.charan-cvs.dev\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n" > ~/.ssh/config
+          # Add host to known_hosts
           ssh-keyscan api-genai.charan-cvs.dev >> ~/.ssh/known_hosts
+          # Debug: show the key and permissions
+          ls -la ~/.ssh
+          head -n 3 ~/.ssh/id_rsa
 
       - name: Test SSH connection
-        run: ssh -i ~/.ssh/id_rsa -v ubuntu@api-genai.charan-cvs.dev echo "SSH connection successful"
+        run: |
+          ssh -i ~/.ssh/id_rsa -v -o BatchMode=yes -o ConnectTimeout=15 ubuntu@api-genai.charan-cvs.dev echo "SSH connection successful"
 
       - name: Deploy and Restart Express App
         run: |
-          ssh -i ~/.ssh/id_rsa -o ConnectTimeout=15 ubuntu@api-genai.charan-cvs.dev << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o BatchMode=yes -o ConnectTimeout=15 ubuntu@api-genai.charan-cvs.dev << 'EOF'
             cd /home/ubuntu/genai-hf-api-key-server
             git fetch
             git reset --hard origin/main
