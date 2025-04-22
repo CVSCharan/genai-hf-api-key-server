@@ -94,7 +94,7 @@ app.get("/", (req, res) => {
             <p>This server manages API keys and provides access to various Generative AI models.</p>
             <p>Explore the available API endpoints to integrate AI capabilities into your applications.</p>
             <footer>
-                &copy; ${new Date().getFullYear()} GenAI Project
+                &copy; ${new Date().getFullYear()} CVS GenAI Platform. All rights reserved.
             </footer>
         </div>
     </body>
